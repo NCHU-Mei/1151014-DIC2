@@ -1,13 +1,21 @@
 # 50 Startups: 多元線性迴歸與 5 大特徵選取方案評比
 
-本專案基於 **CRISP-DM** 方法論與 **Scikit-learn** 機器學習框架，針對經典的 **50 Startups** 資料集進行多元線性迴歸建模，並系統性實作、對比 **5 大特徵選取方案（5 Feature Selection Schemes）** 與打造互動式評比儀表板。
+本專案基於 **CRISP-DM** 方法論與 **Scikit-learn** 機器學習框架，針對經典的 **50 Startups** 資料集進行多元線性迴歸建模，系統性實作並對比 **5 大特徵選取方案（5 Feature Selection Schemes）**，並打造出高質感的現代化互動式評比儀表板。
+
+---
+
+## 🌐 線上展示與成果截圖
+
+> 🚀 **GitHub Pages 線上互動儀表板**：[https://nchu-mei.github.io/1151014-DIC2/](https://nchu-mei.github.io/1151014-DIC2/)
+
+![50 Startups 特徵選取互動評比儀表板](webpage_screenshot.png)
 
 ---
 
 ## 專案亮點
 
 1. **CRISP-DM 完整生命週期 (`main.py`)**：
-   - 商業理解與資料探索（EDA）
+   - 商業理解與探索性資料分析（EDA）
    - One-Hot Encoding 虛擬變數處理與避免虛擬變數陷阱
    - 訓練集/測試集分割與 5-Fold 交叉驗證
    - 殘差診斷與真實值 vs 預測值視覺化
@@ -61,11 +69,12 @@ python feature_selection_comparison.py
 ```
 
 ### 4. 開啟互動式網頁
-在瀏覽器中直接開啟 `index.html`，或啟動本地伺服器：
-```bash
-python -m http.server 8080
-# 瀏覽器訪問 http://localhost:8080/index.html
-```
+- **線上造訪**：[https://nchu-mei.github.io/1151014-DIC2/](https://nchu-mei.github.io/1151014-DIC2/)
+- **本地開啟**：直接在瀏覽器中開啟 `index.html`，或啟動本地伺服器：
+  ```bash
+  python -m http.server 8080
+  # 瀏覽器造訪 http://localhost:8080/index.html
+  ```
 
 ---
 
@@ -76,6 +85,7 @@ python -m http.server 8080
 ├── feature_selection_comparison.py    # 5 大特徵選取評比腳本
 ├── feature_selection_comparison.png   # 5 方案雙折線對比圖 (300 DPI)
 ├── feature_selection_results.csv      # 評比數據報表
+├── webpage_screenshot.png             # 互動式儀表板完整畫面截圖
 ├── actual_vs_predicted.png            # 預測值 vs 真實值散佈圖
 ├── residuals_vs_predicted.png         # 殘差分佈診斷圖
 ├── startup_profit_model.pkl           # 訓練完成之迴歸 Pipeline 模型
