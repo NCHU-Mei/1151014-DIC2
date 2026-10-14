@@ -1,0 +1,26 @@
+﻿Scheme,Number of Features,Selected Features,RMSE,R-squared
+Forward Stepwise (SFS),1,R&D Spend,8274.86801822599,0.9464587607787219
+Forward Stepwise (SFS),2,"R&D Spend, Marketing Spend",8198.797190788488,0.9474386447268488
+Forward Stepwise (SFS),3,"R&D Spend, Marketing Spend, State_New York",8309.05968348172,0.9460153830071389
+Forward Stepwise (SFS),4,"R&D Spend, Marketing Spend, State_New York, State_Florida",8409.916714488054,0.9446968769428332
+Forward Stepwise (SFS),5,"R&D Spend, Marketing Spend, State_New York, State_Florida, State_California",9137.99015279461,0.9347068473282473
+Backward Elimination (SBS),1,R&D Spend,8274.86801822599,0.9464587607787219
+Backward Elimination (SBS),2,"R&D Spend, Marketing Spend",8198.797190788488,0.9474386447268488
+Backward Elimination (SBS),3,"R&D Spend, Administration, Marketing Spend",8803.775790469354,0.9393955917820569
+Backward Elimination (SBS),4,"R&D Spend, Administration, Marketing Spend, State_Florida",9068.541184869358,0.9356955353592088
+Backward Elimination (SBS),5,"R&D Spend, Administration, Marketing Spend, State_Florida, State_New York",9137.990152794957,0.9347068473282423
+RFE (Standardized),1,R&D Spend,8274.86801822599,0.9464587607787219
+RFE (Standardized),2,"R&D Spend, Marketing Spend",8198.797190788488,0.9474386447268488
+RFE (Standardized),3,"R&D Spend, Administration, Marketing Spend",8803.775790469354,0.9393955917820569
+RFE (Standardized),4,"R&D Spend, Administration, Marketing Spend, State_Florida",9068.541184869358,0.9356955353592088
+RFE (Standardized),5,"R&D Spend, Administration, Marketing Spend, State_Florida, State_New York",9137.990152794957,0.9347068473282423
+Lasso Regularization (L1),1,R&D Spend,8274.86801822599,0.9464587607787219
+Lasso Regularization (L1),2,"R&D Spend, Marketing Spend",8198.797190788488,0.9474386447268488
+Lasso Regularization (L1),3,"R&D Spend, Marketing Spend, Administration",8803.775790469346,0.939395591782057
+Lasso Regularization (L1),4,"R&D Spend, Marketing Spend, Administration, State_Florida",9068.541184869362,0.9356955353592088
+Lasso Regularization (L1),5,"R&D Spend, Marketing Spend, Administration, State_Florida, State_New York",9137.990152794951,0.9347068473282424
+Random Forest Importance,1,R&D Spend,8274.86801822599,0.9464587607787219
+Random Forest Importance,2,"R&D Spend, Marketing Spend",8198.797190788488,0.9474386447268488
+Random Forest Importance,3,"R&D Spend, Marketing Spend, Administration",8803.775790469346,0.939395591782057
+Random Forest Importance,4,"R&D Spend, Marketing Spend, Administration, State_California",8803.686428700834,0.9393968220927194
+Random Forest Importance,5,"R&D Spend, Marketing Spend, Administration, State_California, State_Florida",9137.990152706981,0.9347068473294995

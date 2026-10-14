@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>50 Startups 特徵選取方案互動評比儀表板 | Feature Selection Studio</title>
+  <meta name="description" content="互動式探索 5 大機器學習迴歸特徵選取方案（SFS、SBS、RFE、Lasso、隨機森林）在 50 Startups 資料集上的 RMSE 與 R² 評比與即時預測模擬。">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Chart.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+  <!-- Header / Navigation -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-group">
+        <div class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">50 Startups 特徵選取互動評比儀表板</h1>
+          <p class="brand-subtitle">5 Feature Selection Schemes Comparison & Real-time Prediction</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="themeToggleBtn" class="action-btn" title="切換亮色/暗色主題">
+          <span class="theme-icon-light">☀️</span>
+          <span class="theme-icon-dark">🌙</span>
+          <span class="btn-text">風格主題</span>
+        </button>
+        <button id="exportCsvBtn" class="action-btn primary-btn" title="下載完整評比數據 CSV">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span class="btn-text">匯出 CSV</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-main container">
+    <!-- Top KPI Banner -->
+    <section class="kpi-banner">
+      <div class="kpi-card optimal-card">
+        <div class="kpi-badge">共識最佳特徵數</div>
+        <div class="kpi-value">k = 2</div>
+        <div class="kpi-desc">5 大方案一致收斂之全域最優解</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">最佳特徵組合 (Optimal Set)</div>
+        <div class="kpi-tags">
+          <span class="feature-tag highlight-tag">R&D Spend</span>
+          <span class="feature-tag highlight-tag">Marketing Spend</span>
+        </div>
+        <div class="kpi-subtext">剔除 Administration 與地區雜訊</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">最低測試集 RMSE</div>
+        <div class="kpi-metric-val success-val">$8,198.80</div>
+        <div class="kpi-subtext">相較單一特徵降低 0.92% 誤差</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">最高測試集 R²</div>
+        <div class="kpi-metric-val success-val">0.9474 (94.74%)</div>
+        <div class="kpi-subtext">解釋近 95% 之利潤變異量</div>
+      </div>
+    </section>
+
+    <!-- Interactive Schemes Filter Bar -->
+    <section class="section-card filter-card">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">方案切換與多線條對比控制器 (Schemes Toggle)</h2>
+          <p class="section-subtitle">點擊下方按鈕可即時在折線圖上隱藏或顯示指定特徵選取方案：</p>
+        </div>
+        <div class="toggle-group-actions">
+          <button id="showAllSchemesBtn" class="small-btn">全選</button>
+          <button id="clearSchemesBtn" class="small-btn">重設</button>
+        </div>
+      </div>
+      <div class="schemes-pills-container" id="schemesPillsContainer">
+        <!-- Injected via JavaScript -->
+      </div>
+    </section>
+
+    <!-- Dual Charts Section -->
+    <section class="charts-grid">
+      <!-- RMSE Chart Card -->
+      <div class="section-card chart-card">
+        <div class="chart-header">
+          <div>
+            <h3 class="chart-title">RMSE by Number of Features</h3>
+            <span class="chart-desc">越低越好 (Lower is better) - 評估測試集預測誤差</span>
+          </div>
+          <div class="chart-badge">測試集 RMSE ($)</div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas id="rmseChart"></canvas>
+        </div>
+      </div>
+
+      <!-- R-squared Chart Card -->
+      <div class="section-card chart-card">
+        <div class="chart-header">
+          <div>
+            <h3 class="chart-title">R-squared by Number of Features</h3>
+            <span class="chart-desc">越高越好 (Higher is better) - 評估模型可解釋變異度</span>
+          </div>
+          <div class="chart-badge">決定係數 R² (0~1)</div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas id="r2Chart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step-by-Step Deep Dive Inspector -->
+    <section class="section-card inspector-card">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">方案特徵推進歷程深度探索 (Scheme Step Inspector)</h2>
+          <p class="section-subtitle">選擇單一方案並拖曳特徵數量滑桿，觀察該步驟挑出的特徵集合與對應指標變化：</p>
+        </div>
+      </div>
+
+      <div class="inspector-controls">
+        <div class="control-col">
+          <label for="inspectorSchemeSelect" class="input-label">選擇特徵選取方案：</label>
+          <select id="inspectorSchemeSelect" class="custom-select">
+            <option value="sfs">方案 1: 前向逐步選取 (Forward Stepwise Selection, SFS)</option>
+            <option value="sbs">方案 2: 後向淘汰法 (Backward Elimination, SBS)</option>
+            <option value="rfe">方案 3: 遞迴特徵消除 (RFE - Standardized)</option>
+            <option value="lasso">方案 4: Lasso (L1) 稀疏正則化 (Lasso Regularization)</option>
+            <option value="rf">方案 5: 隨機森林特徵重要性 (Random Forest Importance)</option>
+          </select>
+        </div>
+
+        <div class="control-col slider-col">
+          <div class="slider-header">
+            <label for="inspectorKSlider" class="input-label">特徵數量 (Number of Features):</label>
+            <span id="sliderKValue" class="slider-indicator">k = 2</span>
+          </div>
+          <input type="range" id="inspectorKSlider" min="1" max="5" value="2" step="1" class="custom-range">
+          <div class="range-ticks">
+            <span>k=1</span>
+            <span>k=2 ★</span>
+            <span>k=3</span>
+            <span>k=4</span>
+            <span>k=5</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inspector Step Result Details -->
+      <div class="step-details-grid" id="stepDetailsGrid">
+        <div class="detail-box">
+          <div class="detail-label">方案核心流派</div>
+          <div class="detail-val" id="inspectorParadigm">包裝法 (Wrapper)</div>
+          <p class="detail-desc" id="inspectorDescription">從空集合出發，每步貪婪評估並加入能使模型表現最佳的特徵。</p>
+        </div>
+        <div class="detail-box">
+          <div class="detail-label">本步驟入選特徵集合 (Selected Features)</div>
+          <div class="feature-pills-list" id="inspectorFeatureList">
+            <!-- Injected via JavaScript -->
+          </div>
+        </div>
+        <div class="detail-box metric-box">
+          <div class="detail-label">測試集 RMSE</div>
+          <div class="metric-big" id="inspectorRmseVal">$8,198.80</div>
+          <div class="detail-sub" id="inspectorRmseSub">全域最佳低點</div>
+        </div>
+        <div class="detail-box metric-box">
+          <div class="detail-label">測試集 R²</div>
+          <div class="metric-big" id="inspectorR2Val">0.9474</div>
+          <div class="detail-sub" id="inspectorR2Sub">解釋率 94.74%</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Profit Prediction Playground -->
+    <section class="section-card playground-card">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">新創獲利即時預測模擬器 (Live Profit Predictor)</h2>
+          <p class="section-subtitle">輸入新創公司的各項支出與所在州別，即時使用精簡的最佳迴歸模型試算預期獲利：</p>
+        </div>
+        <div class="formula-badge">
+          Profit = 46,346.34 + 0.78862 × (R&D) + 0.03258 × (Marketing)
+        </div>
+      </div>
+
+      <div class="playground-grid">
+        <div class="playground-inputs">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputRd" class="form-label">研發費用 R&D Spend ($):</label>
+              <input type="number" id="inputRd" class="form-input" value="100000" step="1000">
+            </div>
+            <div class="form-group">
+              <label for="inputMarketing" class="form-label">行銷費用 Marketing Spend ($):</label>
+              <input type="number" id="inputMarketing" class="form-input" value="200000" step="1000">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="inputAdmin" class="form-label">行政管理支出 Administration ($):</label>
+              <input type="number" id="inputAdmin" class="form-input" value="120000" step="1000">
+              <span class="field-hint">（在 k=2 最佳模型中不予計入）</span>
+            </div>
+            <div class="form-group">
+              <label for="inputState" class="form-label">註冊州別 State:</label>
+              <select id="inputState" class="form-input">
+                <option value="California">California (加州)</option>
+                <option value="Florida">Florida (佛羅里達州)</option>
+                <option value="New York">New York (紐約州)</option>
+              </select>
+            </div>
+          </div>
+          <button id="calculateProfitBtn" class="primary-btn calculate-btn">
+            即時計算預期獲利
+          </button>
+        </div>
+
+        <div class="playground-result-box">
+          <div class="result-title">預測新創公司利潤 (Predicted Profit)</div>
+          <div class="result-amount" id="predictedProfitDisplay">$131,723.49</div>
+          <div class="result-breakdown" id="predictionBreakdown">
+            基準截距 $46,346.34 + 研發貢獻 $78,861.83 + 行銷貢獻 $6,515.33
+          </div>
+          <div class="confidence-pill">
+            高可信度模型：R² = 0.9474 (無過度擬合)
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comprehensive Data Table -->
+    <section class="section-card table-section">
+      <div class="section-header table-header-flex">
+        <div>
+          <h2 class="section-title">全方案歷程資料表 (Comprehensive Results Table)</h2>
+          <p class="section-subtitle">支援依方案篩選、特徵數篩選與升降冪排序，完整呈現 25 筆組合測試數據：</p>
+        </div>
+        <div class="table-filters">
+          <select id="tableSchemeFilter" class="custom-select small-select">
+            <option value="all">全部方案 (All Schemes)</option>
+            <option value="sfs">SFS (前向逐步)</option>
+            <option value="sbs">SBS (後向淘汰)</option>
+            <option value="rfe">RFE (遞迴消除)</option>
+            <option value="lasso">Lasso (正則化)</option>
+            <option value="rf">Random Forest (隨機森林)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table" id="resultsDataTable">
+          <thead>
+            <tr>
+              <th>方案 (Scheme)</th>
+              <th>特徵數 (k)</th>
+              <th>入選特徵集合 (Selected Features)</th>
+              <th class="text-right">RMSE ($)</th>
+              <th class="text-right">R-squared</th>
+              <th class="text-center">狀態</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Injected via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Methodology Insights / Knowledge Notes -->
+    <section class="insights-grid">
+      <div class="insight-card">
+        <div class="insight-icon">🔍</div>
+        <h4 class="insight-title">為什麼 k = 2 是最佳解？</h4>
+        <p class="insight-body">
+          從殘差與誤差曲線可看出，僅納入「研發支出」與「行銷支出」時 RMSE 達到最低點 $8,198.80。一旦繼續加入第 3~5 個變數（如行政支出或地區虛擬變數），因這些變數與獲利關聯甚微且可能伴隨多重共線性，導致測試集泛化誤差上升，這即是典型的<strong>過度擬合 (Overfitting)</strong>。
+        </p>
+      </div>
+
+      <div class="insight-card">
+        <div class="insight-icon">⚖️</div>
+        <h4 class="insight-title">模型簡約法則 (Parsimony Principle)</h4>
+        <p class="insight-body">
+          奧卡姆剃刀 (Occam's Razor) 原則指出：在預測力相同的前提下，應優先採用變數最少、最易解釋的模型。2 個特徵的模型不僅計算成本極低、業務意涵直觀，且在未見過的新測試數據上表現最穩健。
+        </p>
+      </div>
+
+      <div class="insight-card">
+        <div class="insight-icon">💡</div>
+        <h4 class="insight-title">5 大演算法的跨流派對比</h4>
+        <p class="insight-body">
+          本實驗橫跨了「貪婪包裝法 (SFS/SBS)」、「權重敏感度包裝法 (RFE)」、「線性正則化嵌入法 (Lasso)」與「非線性樹模型嵌入法 (Random Forest)」，所有方法皆在特徵重要度排序中將 R&D Spend 列為首位、Marketing 列為次席，展現了強大的數學共識。
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="container footer-content">
+      <p>50 Startups Regression Feature Selection Comparison Studio</p>
+      <p class="footer-meta">CRISP-DM 專案實作 · 基於 Scikit-learn, Pandas & Chart.js</p>
+    </div>
+  </footer>
+
+  <!-- App Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
